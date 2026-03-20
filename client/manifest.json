@@ -1,0 +1,48 @@
+{
+  "name": "URLChecker",
+  "version": "1.0",
+  "description": "Checks validity and status of URLs",
+  "author": "Ryan Pyburn",
+  "urls": [
+    "https://google.com",
+    "https://github.com",
+    "https://invalid-url-test.com"{
+  "appName": "URLChecker",
+  "version": "1.0.0",
+  "description": "URL safety checker using REST API and threat intelligence",
+  "api": {
+    "baseUrl": "https://api.urlchecker.com/api/v1",
+    "endpoints": {
+      "checkUrl": "/check-url",
+      "getScans": "/scans",
+      "report": "/report",
+      "health": "/health"
+    },
+    "timeoutMs": 1000
+  },
+
+  "validation": {
+    "maxUrlLength": 2048,
+    "requiredProtocol": ["http", "https"]
+  },
+
+  "logging": {
+    "enabled": true,
+    "logLevel": "info",
+    "storeScans": true
+  },
+
+  "features": {
+    "liveDetection": true,
+    "cloudCaching": false,
+    "userReporting": false
+  },
+
+  "testUrls": [
+    "https://google.com",
+    "https://github.com",
+    "http://malicious-site.com"
+  ]
+}
+  ]
+}
