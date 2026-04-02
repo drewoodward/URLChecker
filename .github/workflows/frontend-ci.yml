@@ -1,0 +1,22 @@
+name: Frontend CI
+
+on:
+  push:
+    paths:
+      - 'client/**'
+  pull_request:
+    paths:
+      - 'client/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build (Zip) Extension
+        run: |
+          cd client/src
+          zip -r ../urlchecker-extension.zip ./
