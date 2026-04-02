@@ -3,9 +3,11 @@
   "name": "URLChecker",
   "version": "1.0.0",
   "description": "URL Safety Checker",
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html"
   },
-  "permissions": ["storage"],
-  "host_permissions": ["<all_urls>"]
+  "permissions": ["storage"]
 }
