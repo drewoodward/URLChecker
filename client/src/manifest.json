@@ -1,39 +1,11 @@
 {
-  "appName": "URLChecker",
+  "manifest_version": 3,
+  "name": "URLChecker",
   "version": "1.0.0",
-  "description": "URL safety checker using REST API and threat intelligence",
-
-  "api": {
-    "baseUrl": "https://api.urlchecker.com/api/v1",
-    "endpoints": {
-      "checkUrl": "/check-url",
-      "getScans": "/scans",
-      "report": "/report",
-      "health": "/health"
-    },
-    "timeoutMs": 1000
+  "description": "URL Safety Checker",
+  "action": {
+    "default_popup": "popup.html"
   },
-
-  "validation": {
-    "maxUrlLength": 2048,
-    "requiredProtocol": ["http", "https"]
-  },
-
-  "logging": {
-    "enabled": true,
-    "logLevel": "info",
-    "storeScans": true
-  },
-
-  "features": {
-    "liveDetection": true,
-    "cloudCaching": false,
-    "userReporting": false
-  },
-
-  "testUrls": [
-    "https://google.com",
-    "https://github.com",
-    "http://malicious-site.com"
-  ]
+  "permissions": ["storage"],
+  "host_permissions": ["<all_urls>"]
 }
