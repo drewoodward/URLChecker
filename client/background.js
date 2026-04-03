@@ -1,1 +1,0 @@
-// service worker that runs in background
