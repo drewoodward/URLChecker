@@ -9,5 +9,6 @@
   "action": {
     "default_popup": "popup.html"
   },
-  "permissions": ["storage"]
+  "permissions": ["storage"],
+  "host_permissions": ["http://localhost:8000/*"]
 }
