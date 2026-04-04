@@ -10,5 +10,5 @@
     "default_popup": "popup.html"
   },
   "permissions": ["storage"],
-  "host_permissions": ["http://localhost:8000/*"]
+  "host_permissions": ["https://urlchecker-backend-758639415294.us-east4.run.app/*"]
 }
