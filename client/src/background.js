@@ -2,7 +2,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "checkUrl") {
         console.log("Service worker received URL:", request.url);
 
-        fetch('http://localhost:8000/check', {
+        fetch('https://urlchecker-backend-758639415294.us-east4.run.app/check', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else if (request.action === "getHistory") {
         console.log("Service worker fetching history");
 
-        fetch('http://localhost:8000/history')
+        fetch('https://urlchecker-backend-758639415294.us-east4.run.app/history')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
