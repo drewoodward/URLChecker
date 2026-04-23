@@ -4,6 +4,7 @@ const { admin, db } = require('./firebase');
 
 const app = express();
 const PORT = process.env.PORT || 8000;
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'https://urlchecker-ml-758639415294.us-east4.run.app';
 
 app.use(cors());
 app.use(express.json());
@@ -20,16 +21,21 @@ app.post('/check', async (req, res) => {
 
   const cleanUrl = url.trim();
 
-  //bs temp testing
-  const is_malicious = cleanUrl.includes('bad');
-
+  let is_malicious;
   let confidence;
-
-  //bs temp testing
-  if (is_malicious) {
-    confidence = 0.9;
-  } else {
-    confidence = 0.1;
+  try {
+    const mlRes = await fetch(`${ML_SERVICE_URL}/predict`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: cleanUrl })
+    });
+    if (!mlRes.ok) throw new Error(`ML service returned ${mlRes.status}`);
+    const prediction = await mlRes.json();
+    is_malicious = prediction.is_malicious;
+    confidence = prediction.confidence;
+  } catch (err) {
+    console.error('ML service call failed:', err);
+    return res.status(502).json({ error: 'Prediction service unavailable' });
   }
 
   let scanId = null;
