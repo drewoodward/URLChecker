@@ -5,9 +5,43 @@ const { admin, db } = require('./firebase');
 const app = express();
 const PORT = process.env.PORT || 8000;
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'https://urlchecker-ml-758639415294.us-east4.run.app';
+const URLHAUS_API_KEY = process.env.URLHAUS_API_KEY;
 
 app.use(cors());
 app.use(express.json());
+
+async function checkURLhaus(url) {
+  try {
+    const params = new URLSearchParams({ url });
+    const response = await fetch('https://urlhaus-api.abuse.ch/v1/url/', {
+      method: 'POST',
+      headers: {
+        'Auth-Key': URLHAUS_API_KEY,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+
+    const data = await response.json();
+
+    if (data.query_status === 'no_results') {
+      return { found: false };
+    }
+
+    return {
+      found: true,
+      status: data.url_status,
+      threat: data.threat,
+      tags: data.tags || [],
+      dateAdded: data.date_added,
+      blacklists: data.blacklists,
+      payloads: data.payloads || [],
+    };
+  } catch (err) {
+    console.error('URLhaus lookup failed:', err.message);
+    return null;
+  }
+}
 
 app.post('/check', async (req, res) => {
   const { url } = req.body || {};
@@ -38,12 +72,15 @@ app.post('/check', async (req, res) => {
     return res.status(502).json({ error: 'Prediction service unavailable' });
   }
 
+  const urlhausData = await checkURLhaus(cleanUrl);
+
   let scanId = null;
   try {
     const scanRef = await db.collection('scans').add({
       url: cleanUrl,
       is_malicious: is_malicious,
       confidence: confidence,
+      urlhaus: urlhausData,
       timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
     scanId = scanRef.id;
@@ -56,7 +93,8 @@ app.post('/check', async (req, res) => {
   res.json({
     is_malicious,
     confidence,
-    scanId
+    scanId,
+    urlhaus: urlhausData,
   });
 });
 
