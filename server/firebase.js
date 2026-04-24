@@ -14,7 +14,8 @@ if (process.env.NODE_ENV === 'production') {
 // export Firestore database instance, specifying the databaseId for the new native mode database
 const db = admin.firestore();
 db.settings({
-  databaseId: "urlchecker-db"
+  databaseId: "urlchecker-db",
+  ignoreUndefinedProperties: true,
 });
 
 module.exports = { admin, db };
