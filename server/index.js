@@ -24,8 +24,8 @@ async function checkURLhaus(url) {
 
     const data = await response.json();
 
-    if (data.query_status === 'no_results') {
-      return { found: false };
+    if (data.query_status !== 'ok') {
+      return { found: false, queryStatus: data.query_status };
     }
 
     return {
@@ -36,6 +36,7 @@ async function checkURLhaus(url) {
       dateAdded: data.date_added,
       blacklists: data.blacklists,
       payloads: data.payloads || [],
+      reference: data.urlhaus_reference,
     };
   } catch (err) {
     console.error('URLhaus lookup failed:', err.message);

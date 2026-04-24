@@ -7,11 +7,21 @@
         button { width: 100%; padding: 10px; cursor: pointer; margin-bottom: 10px; }
         #status { margin-top: 10px; color: blue; text-align: center; }
         #history-section { margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px; }
-        .history-item { font-size: 12px; margin-bottom: 5px; padding: 8px; background: #f9f9f9; border-radius: 4px; word-break: break-all; }
+        .history-item { font-size: 12px; margin-bottom: 5px; padding: 8px; background: #f9f9f9; border-radius: 4px; word-break: break-all; cursor: pointer; }
+        .history-item:hover { background: #f1f1f1; }
         .history-safe { border-left: 4px solid green; }
         .history-malicious { border-left: 4px solid red; }
         .history-url { font-weight: bold; display: block; margin-bottom: 3px; }
         .history-info { color: #555; }
+        .history-caret { float: right; color: #888; font-size: 10px; margin-left: 6px; }
+        .history-details { display: none; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ddd; color: #333; cursor: default; }
+        .history-item.expanded .history-details { display: block; }
+        .history-item.expanded .history-caret::before { content: "\25B2"; }
+        .history-item:not(.expanded) .history-caret::before { content: "\25BC"; }
+        .history-details .row { margin-bottom: 3px; }
+        .history-details .label { color: #666; font-weight: bold; margin-right: 4px; }
+        .history-details .tag { display: inline-block; background: #e7e7e7; padding: 1px 6px; border-radius: 10px; margin: 2px 3px 2px 0; font-size: 11px; }
+        .history-details .muted { color: #888; font-style: italic; }
     </style>
 </head>
 <body>
