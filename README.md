@@ -1,13 +1,18 @@
 # URLChecker
 CSCI4170 - Cloud Computing group project focusing on a cloud based application that checks for abnormalities or viruses in URL's.
 
-Our project involves creating a Chrome Extension designed to protect users from suspicious web links that may contain malware or phishing schemes. The app will evaluate links in real time and give a simple response as to whether the link is safe. It will be able to do this using a cloud-based RESTful service that connects with a preexisting threat database. Our goal is to provide a lightweight, fast, and apparent warning system for our end users to provide an extra barrier of security.
+Our project involves creating a Chrome Extension designed to protect users from suspicious web links that may contain malware or phishing schemes. The app will evaluate links in real time and give a simple response as to whether the link is safe. It will be able to do this using a cloud-based RESTful service that connects with a preexisting threat database. The system also uses a machine learning model to classify URLs and enhance detection accuracy. Our goal is to provide a lightweight, fast, and apparent warning system for our end users to provide an extra barrier of security.
 
 ## Features
 - **Real-Time URL Checking**: Instantly evaluate if a URL is malicious or safe.
 - **Scan History**: View your recent scan history directly in the extension popup to keep track of previously checked links.
 
 ## Setup and Installation
+
+## Prerequisites
+- Node.js and npm installed
+- Python 3 and pip installed
+- Google Chrome
 
 ### 1. Backend Server Setup (Node.js & Firebase)
 
@@ -35,6 +40,21 @@ The backend uses Express.js and connects to Firebase Firestore to log URL scans.
    node index.js
    ```
 The server will now be running on `http://localhost:8000`.
+
+**Running the ML Service (Python FastAPI):**
+1. Open your terminal and navigate to `ml-service` directory:
+   ```bash
+   cd ml-service
+   ```
+2.  Install the necessary dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Start server:
+   ```bash
+   uvicorn main:app --reload
+   ```
+The ML service will now be running on `http://127.0.0.1:8000`
 
 ### 2. Client Setup (Chrome Extension)
 
