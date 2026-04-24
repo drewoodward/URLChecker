@@ -26,6 +26,8 @@ The backend uses Express.js and connects to Firebase Firestore to log URL scans.
 5. Save the downloaded JSON file as `serviceAccountKey.json` inside the `server/` directory.
    > *Note: Never commit `serviceAccountKey.json` to version control! Ensure it is in your `.gitignore`.*
 
+**Running the backend locally is optional and only needed for development**
+
 **Running the Server:**
 1. Open your terminal and navigate to the `server` directory:
    ```bash
