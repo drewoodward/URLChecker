@@ -117,7 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.error) {
                 console.error('Error from background:', response.error);
                 status.style.color = 'red';
-                status.innerText = 'Error checking URL.';
+                if (response.status === 400) {
+                    status.innerText = 'Invalid URL. Please enter a valid http:// or https:// URL.';
+                } else {
+                    status.innerText = 'Service unavailable. Please try again later.';
+                }
             } else if (response.data) {
                 const data = response.data;
                 if (data.is_malicious) {

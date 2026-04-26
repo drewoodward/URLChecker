@@ -10,6 +10,15 @@ const URLHAUS_API_KEY = process.env.URLHAUS_API_KEY;
 app.use(cors());
 app.use(express.json());
 
+function isValidUrl(str) {
+  try {
+    const u = new URL(str);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 async function checkURLhaus(url) {
   try {
     const params = new URLSearchParams({ url });
@@ -55,6 +64,12 @@ app.post('/check', async (req, res) => {
   }
 
   const cleanUrl = url.trim();
+
+  if (!isValidUrl(cleanUrl)) {
+    return res.status(400).json({
+      error: 'Invalid URL'
+    });
+  }
 
   let is_malicious;
   let confidence;

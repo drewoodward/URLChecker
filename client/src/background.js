@@ -9,19 +9,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             },
             body: JSON.stringify({ url: request.url })
         })
-        .then(response => {
+        .then(async response => {
+            const data = await response.json().catch(() => ({}));
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                sendResponse({ error: data.error || `HTTP ${response.status}`, status: response.status });
+                return;
             }
-            return response.json();
-        })
-        .then(data => {
             console.log("API response:", data);
             sendResponse({ data: data });
         })
         .catch(error => {
             console.error('API Error:', error);
-            sendResponse({ error: error.toString() });
+            sendResponse({ error: error.toString(), status: 0 });
         });
 
     } else if (request.action === "getHistory") {
