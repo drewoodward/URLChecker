@@ -100,3 +100,126 @@ WXT will launch the selected browser with the extension already loaded.
 
 - Chrome: navigate to `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select `client/dist/chrome-mv3`.
 - Firefox: navigate to `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on**, and select the `manifest.json` inside `client/dist/firefox-mv2`.
+
+## API Usage
+
+The system exposes two HTTP services. Most clients will only need the backend.
+
+- **Backend (Express + Firestore + URLhaus)**: `https://urlchecker-backend-758639415294.us-east4.run.app`
+- **ML service (FastAPI + LightGBM)**: `https://urlchecker-ml-758639415294.us-east4.run.app`
+
+If you're running locally, replace the hosts with `http://localhost:8000` (backend) and `http://127.0.0.1:8000` (ML service).
+
+### Backend
+
+#### `POST /check`
+
+Run a URL through the ML model, query URLhaus, and log the result to Firestore.
+
+**Request**
+
+```bash
+curl -X POST https://urlchecker-backend-758639415294.us-east4.run.app/check \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'
+```
+
+**Response (200)**
+
+```json
+{
+  "is_malicious": false,
+  "confidence": 0.987,
+  "scanId": "8f3c1b2e9a4d5f6789abcd01",
+  "urlhaus": {
+    "found": false,
+    "queryStatus": "no_results"
+  }
+}
+```
+
+When URLhaus has a hit, `urlhaus` includes `status`, `threat`, `tags`, `dateAdded`, `blacklists`, `payloads`, and `reference`.
+
+**Errors**
+
+| Status | When | Body |
+|--------|------|------|
+| `400`  | Missing or non-`http(s)` URL | `{ "error": "Invalid URL" }` |
+| `502`  | ML service unreachable | `{ "error": "Prediction service unavailable" }` |
+
+#### `GET /history`
+
+Return the 5 most recent scans, newest first.
+
+**Request**
+
+```bash
+curl https://urlchecker-backend-758639415294.us-east4.run.app/history
+```
+
+**Response (200)**
+
+```json
+[
+  {
+    "id": "8f3c1b2e9a4d5f6789abcd01",
+    "url": "https://example.com",
+    "is_malicious": false,
+    "confidence": 0.987,
+    "urlhaus": { "found": false, "queryStatus": "no_results" },
+    "timestamp": { "_seconds": 1714060800, "_nanoseconds": 0 }
+  }
+]
+```
+
+### ML service
+
+The ML service is normally called by the backend, but you can hit it directly for debugging.
+
+#### `POST /predict`
+
+**Request**
+
+```bash
+curl -X POST https://urlchecker-ml-758639415294.us-east4.run.app/predict \
+  -H "Content-Type: application/json" \
+  -d '{"url": "http://192.168.0.1/login.php?account=verify"}'
+```
+
+**Response (200)**
+
+```json
+{
+  "url": "http://192.168.0.1/login.php?account=verify",
+  "label": "phishing",
+  "is_malicious": true,
+  "confidence": 0.91,
+  "scores": {
+    "benign": 0.04,
+    "defacement": 0.02,
+    "phishing": 0.91,
+    "malware": 0.03
+  }
+}
+```
+
+`label` is one of `benign`, `defacement`, `phishing`, `malware`. `is_malicious` is `true` for any non-`benign` label.
+
+#### `GET /health`
+
+```bash
+curl https://urlchecker-ml-758639415294.us-east4.run.app/health
+# {"status":"ok"}
+```
+
+### JavaScript example
+
+```js
+const res = await fetch('https://urlchecker-backend-758639415294.us-east4.run.app/check', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ url: 'https://example.com' }),
+});
+const data = await res.json();
+console.log(data.is_malicious, data.confidence);
+```
