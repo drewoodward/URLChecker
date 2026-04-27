@@ -1,3 +1,5 @@
+import { browser } from 'wxt/browser';
+
 function renderUrlhausDetails(container, urlhaus) {
     container.innerHTML = '';
 
@@ -95,22 +97,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const historyBtn = document.getElementById('history-btn');
     const historyList = document.getElementById('history-list');
 
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
         const urlToCheck = urlInput.value.trim();
-        
+
         if (!urlToCheck) {
-            status.innerText = "Please enter a URL.";
+            status.innerText = 'Please enter a URL.';
             return;
         }
 
+        status.style.color = 'blue';
         status.innerText = `Checking ${urlToCheck}...`;
-        console.log("URL to check:", urlToCheck);
+        console.log('URL to check:', urlToCheck);
 
-        chrome.runtime.sendMessage({ action: "checkUrl", url: urlToCheck }, (response) => {
-            if (chrome.runtime.lastError) {
-                console.error("Runtime error:", chrome.runtime.lastError);
+        try {
+            const response = await browser.runtime.sendMessage({
+                action: 'checkUrl',
+                url: urlToCheck,
+            });
+
+            if (!response) {
                 status.style.color = 'red';
-                status.innerText = 'Error communicating with background script.';
+                status.innerText = 'No response from background script.';
                 return;
             }
 
@@ -122,7 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     status.innerText = 'Service unavailable. Please try again later.';
                 }
-            } else if (response.data) {
+                return;
+            }
+
+            if (response.data) {
                 const data = response.data;
                 if (data.is_malicious) {
                     status.style.color = 'red';
@@ -132,16 +142,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     status.innerText = `Safe! Confidence: ${(data.confidence * 100).toFixed(2)}%`;
                 }
             }
-        });
+        } catch (err) {
+            console.error('Runtime error:', err);
+            status.style.color = 'red';
+            status.innerText = 'Error communicating with background script.';
+        }
     });
 
-    historyBtn.addEventListener('click', () => {
+    historyBtn.addEventListener('click', async () => {
         historyList.innerHTML = 'Loading history...';
 
-        chrome.runtime.sendMessage({ action: "getHistory" }, (response) => {
-            if (chrome.runtime.lastError) {
-                console.error("Runtime error:", chrome.runtime.lastError);
-                historyList.innerHTML = '<span style="color: red;">Error communicating with background script.</span>';
+        try {
+            const response = await browser.runtime.sendMessage({ action: 'getHistory' });
+
+            if (!response) {
+                historyList.innerHTML = '<span style="color: red;">No response from background script.</span>';
                 return;
             }
 
@@ -154,12 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.data) {
                 const historyData = response.data;
                 historyList.innerHTML = '';
-                
+
                 if (historyData.length === 0) {
                     historyList.innerHTML = '<p>No recent scans found.</p>';
                     return;
                 }
-                
+
                 historyData.forEach(scan => {
                     const item = document.createElement('div');
                     item.className = 'history-item ' + (scan.is_malicious ? 'history-malicious' : 'history-safe');
@@ -194,6 +209,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     historyList.appendChild(item);
                 });
             }
-        });
+        } catch (err) {
+            console.error('Runtime error:', err);
+            historyList.innerHTML = '<span style="color: red;">Error communicating with background script.</span>';
+        }
     });
 });
