@@ -1,6 +1,16 @@
-package-lock.json
+/package-lock.json
 node_modules/
 .env
 *.DS_Store
 content/
 __pycache__/
+
+# WXT
+.wxt/
+.output/
+client/dist/
+web-ext.config.ts
+web-ext.config.js
+web-ext.config.mjs
+stats.html
+stats-*.json

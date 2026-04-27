@@ -11,12 +11,40 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build (Zip) Extension
-        run: |
-          cd client/src
-          zip -r ../urlchecker-extension.zip ./
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build & zip Chrome extension
+        run: npm run zip
+
+      - name: Build & zip Firefox extension
+        run: npm run zip:firefox
+
+      - name: Upload Chrome artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: urlchecker-chrome
+          path: client/dist/*-chrome.zip
+
+      - name: Upload Firefox artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: urlchecker-firefox
+          path: |
+            client/dist/*-firefox.zip
+            client/dist/*-sources.zip

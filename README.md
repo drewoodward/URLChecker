@@ -1,7 +1,9 @@
 # URLChecker
 CSCI4170 - Cloud Computing group project focusing on a cloud based application that checks for abnormalities or viruses in URL's.
 
-Our project involves creating a Chrome Extension designed to protect users from suspicious web links that may contain malware or phishing schemes. The app will evaluate links in real time and give a simple response as to whether the link is safe. It will be able to do this using a cloud-based RESTful service that connects with a preexisting threat database. The system also uses a machine learning model to classify URLs and enhance detection accuracy. Our goal is to provide a lightweight, fast, and apparent warning system for our end users to provide an extra barrier of security.
+Our project involves creating a browser extension (Chrome and Firefox) designed to protect users from suspicious web links that may contain malware or phishing schemes. The app will evaluate links in real time and give a simple response as to whether the link is safe. It will be able to do this using a cloud-based RESTful service that connects with a preexisting threat database. The system also uses a machine learning model to classify URLs and enhance detection accuracy. Our goal is to provide a lightweight, fast, and apparent warning system for our end users to provide an extra barrier of security.
+
+The extension is built with the [WXT](https://wxt.dev) framework, which produces builds for both Chrome (Manifest V3) and Firefox (Manifest V2 by default) from a single codebase.
 
 ## Features
 - **Real-Time URL Checking**: Instantly evaluate if a URL is malicious or safe.
@@ -10,9 +12,9 @@ Our project involves creating a Chrome Extension designed to protect users from 
 ## Setup and Installation
 
 ## Prerequisites
-- Node.js and npm installed
+- Node.js 18+ and npm installed
 - Python 3 and pip installed
-- Google Chrome
+- Google Chrome and/or Mozilla Firefox
 
 ### 1. Backend Server Setup (Node.js & Firebase)
 
@@ -58,10 +60,43 @@ The server will now be running on `http://localhost:8000`.
    ```
 The ML service will now be running on `http://127.0.0.1:8000`
 
-### 2. Client Setup (Chrome Extension)
+### 2. Client Setup (Browser Extension)
 
-1. Open Google Chrome and navigate to `chrome://extensions/`.
-2. Toggle on **Developer mode** in the top right corner.
-3. Click the **Load unpacked** button.
-4. Select the `client` folder from this repository.
-5. The extension should now be loaded and ready to interact with the backend server.
+The client is a [WXT](https://wxt.dev) project that builds the same source for Chrome and Firefox.
+
+1. Install dependencies:
+   ```bash
+   cd client
+   npm install
+   ```
+
+#### Development (with hot reload)
+
+- Chrome:
+  ```bash
+  npm run dev
+  ```
+- Firefox:
+  ```bash
+  npm run dev:firefox
+  ```
+
+WXT will launch the selected browser with the extension already loaded.
+
+#### Production builds
+
+- Chrome:
+  ```bash
+  npm run build           # outputs to dist/chrome-mv3
+  npm run zip             # outputs a zip in dist/
+  ```
+- Firefox:
+  ```bash
+  npm run build:firefox   # outputs to dist/firefox-mv2
+  npm run zip:firefox     # outputs a zip + sources zip in dist/
+  ```
+
+#### Loading an unpacked build manually
+
+- Chrome: navigate to `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, and select `client/dist/chrome-mv3`.
+- Firefox: navigate to `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on**, and select the `manifest.json` inside `client/dist/firefox-mv2`.
